@@ -1,0 +1,74 @@
+version: 2
+
+sources:
+  - name: public
+    database: PROJECT
+    schema: public
+    tables:
+      - name: binance_features
+      - name: fed_features
+      - name: tradingview_features
+      - name: garch_estimators_from_r
+
+models:
+  - name: squeeze_momentum
+    description: "Squeeze momentum model"
+    columns:
+      - name: timestamp
+        description: "The primary key for this table"
+        tests:
+          - unique
+      - name: squeeze
+        description: "The squeeze value"
+      - name: close_price
+        description: "The close price"
+      - name: momentum
+        description: "The momentum value"
+      - name: dollar_cumulative_volume
+        description: "The dollar cumulative volume"
+      - name: bitcoin_cumulative_volume
+        description: "The bitcoin cumulative volume"
+      - name: consecutive_sqz_on
+        description: "The number of consecutive squeezes on"
+      - name: date_index
+        description: "The timestamp index linked to the end of the week"
+      - name: row_index
+        description: "The row index linked to the row number (see batch_size varaible in dbt_project.yml)"
+  - name: smb_backtest
+    description: "Backtest results from squeeze_momentum"
+    columns:
+      - name: squeeze_threshold
+        description: "The squeeze threshold"
+      - name: momentum_threshold
+        description: "The momentum threshold"
+      - name: number_of_trades
+        description: "The number of trades"
+      - name: number_of_positive_trades
+        description: "The number of positive trades"
+      - name: cumulative_return
+        description: "The cumulative return per squeeze momentum strategy"
+      - name: row_index
+        description: "The row index linked to the row number (see batch_size varaible in dbt_project.yml)"
+      - name: finish_timestamp
+        description: "The timestamp when the backtest ends (per squeeze momentum)"
+  - name: squeeze_momentum_knn_centroids
+    description: "KNN centroids for squeeze momentum"
+    columns:
+      - name: knn
+        description: "The KNN value"
+      - name: quantile
+        description: "The quantile value"
+      - name: finish_timestamp
+        description: "The timestamp when the backtest ends (per squeeze momentum)"
+      - name: rn
+        description: "The row number linked to the row index"
+      - name: squeeze_threshold_centroid
+        description: "The squeeze centroid"
+      - name: momentum_threshold_centroid
+        description: "The momentum centroid"
+      - name: outcome
+        description: "The outcome of the squeeze momentum strategy (1 for positive, -1 for negative)"
+      - name: upper_quantile
+        description: "The upper quantile"
+      - name: lower_quantile
+        description: "The lower quantile"
