@@ -9,6 +9,7 @@ sources:
       - name: fed_features
       - name: tradingview_features
       - name: garch_estimators_from_r
+      - name: garch_sigma_from_r
 
 models:
   - name: squeeze_momentum
@@ -72,3 +73,33 @@ models:
         description: "The upper quantile"
       - name: lower_quantile
         description: "The lower quantile"
+  - name: kalman_smoothing_weights
+    description: "Kalman smoothing weights for squeeze momentum. The weights are used as a response variable for the ML model"
+    config:
+      Q: '{{ var("Q") }}'
+      H: '{{ var("H") }}'
+      kfs_upper_threshold: '{{ var("kfs_upper_threshold") }}'
+      kfs_lower_threshold: '{{ var("kfs_lower_threshold") }}'
+      kfs_lambda: '{{ var("kfs_lambda") }}'
+      kfs_distribution_shift: '{{ var("kfs_distribution_shift") }}'
+      kfs_window_size: '{{ var("kfs_window_size") }}'
+    columns:
+      - name: date_index
+        description: "The date index"
+        tests:
+          - unique
+      - name: log_return
+        description: "The log return"
+      - name: skew_estimate
+        description: "The skew estimate from the GJR GARCH model on BTC time series"
+      - name: lead_log_return
+        description: "The lead log return. This is used as a response in the ML model only"
+      - name: kalman_filter
+        description: "The cumulative sum of kalman smoothing forecast on the skew log return"
+      - name: indicator
+        description: "The indicator conditioned on the kalman filter. See the model for more details"
+      - name: adj_log_return
+        description: "The adjusted log return conditioned on indicator. See the model for more details.
+         This is used as a response in the ML model only"
+      - name: weight
+        description: "The kalman smoothing weights. This is used as a response in the ML model only"
