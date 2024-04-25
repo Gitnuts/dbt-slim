@@ -57,14 +57,19 @@ add_fed_features as (
 add_sm_performance as (
     select
         add_fed_features.*
-        , squeeze_log_change
-        , momentum_log_change
-        , positive_trade_perc
         , log_return
-        , total_log_return
-        , strategy_updated
+        , number_of_trades
+        , number_of_positive_trades
         , case when inflation_rate >= 2 then 1 else -1 end as inflation_rate_factor
-    from add_fed_features join {{ ref('sm_performance') }} as smp
+    from add_fed_features join (
+        select
+            date_index
+            , sum(log_return) as log_return
+            , sum(number_of_trades) as number_of_trades
+            , sum(number_of_positive_trades) as number_of_positive_trades
+        from {{ ref('sm_performance') }}
+        group by date_index
+        order by date_index) as smp
         on add_fed_features.date_index = smp.date_index
 ),
 add_garch_sigma as (

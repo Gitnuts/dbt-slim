@@ -9,14 +9,14 @@ def model(dbt, fal):
 
     Q = float(dbt.config.get("Q"))
     H = float(dbt.config.get("H"))
-    kfs_upper_threshold = float(dbt.config.get("kfs_upper_threshold"))
-    kfs_lower_threshold = float(dbt.config.get("kfs_lower_threshold"))
+    skew_threshold = float(dbt.config.get("skew_threshold"))
+    bitcoin_dominance_threshold = float(dbt.config.get("bitcoin_dominance_threshold"))
     kfs_lambda = float(dbt.config.get("kfs_lambda"))
     kfs_distribution_shift = float(dbt.config.get("kfs_distribution_shift"))
     kfs_window_size = int(dbt.config.get("kfs_window_size"))
 
     df: pd.DataFrame = dbt.ref("sm_feature_matrix")
-    df = df[["date_index", "log_return", "skew_estimate"]]
+    df = df[["date_index", "log_return", "skew_estimate", "bitcoin_dominance"]]
 
     df['lead_log_return'] = df['log_return'].shift(-1)
     df = df.dropna()
@@ -39,12 +39,20 @@ def model(dbt, fal):
     )
 
     model.bind(df['skew_log_return'].values)
-    model.initialize_known([0], [[Q]])
+    model.initialize_known([0], [[0]])
 
-    df['kalman_filter'] = np.cumsum(model.filter().forecasts)
-    df['indicator'] = np.where((df['kalman_filter'] > kfs_upper_threshold) |
-                                 ((df['kalman_filter'] > df['kalman_filter'].shift(1)) &
-                                  (df['kalman_filter'] > kfs_lower_threshold)), 1, -1)
+    results = model.filter()
+    forecast_cumsum = np.cumsum(results.forecasts)
+
+    min_val = forecast_cumsum.min()
+    max_val = forecast_cumsum.max()
+
+    scaled_data = (forecast_cumsum - min_val) / (max_val - min_val)
+
+    df['kalman_filter'] = scaled_data
+    df['indicator'] = np.where((df['kalman_filter'] < skew_threshold) &
+                               (df['bitcoin_dominance'] > bitcoin_dominance_threshold), -1, 1)
+    df['adj_log_return'] = df['indicator'] * df['lead_log_return']
 
     df['adj_log_return'] = df['indicator'] * df['lead_log_return']
 

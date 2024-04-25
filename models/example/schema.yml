@@ -78,8 +78,8 @@ models:
     config:
       Q: '{{ var("Q") }}'
       H: '{{ var("H") }}'
-      kfs_upper_threshold: '{{ var("kfs_upper_threshold") }}'
-      kfs_lower_threshold: '{{ var("kfs_lower_threshold") }}'
+      skew_threshold: '{{ var("skew_threshold") }}'
+      bitcoin_dominance_threshold: '{{ var("bitcoin_dominance_threshold") }}'
       kfs_lambda: '{{ var("kfs_lambda") }}'
       kfs_distribution_shift: '{{ var("kfs_distribution_shift") }}'
       kfs_window_size: '{{ var("kfs_window_size") }}'
