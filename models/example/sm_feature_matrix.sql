@@ -81,10 +81,9 @@ add_garch_sigma as (
 		, shape
 		, realized
 		, sign( lag(log_return, -1) over (order by addsmp.date_index) ) as sign_log_return
-	from add_sm_performance addsmp join {{ source('public', 'garch_sigma_from_r') }} gsfr on addsmp.date_index = gsfr.date_index
+	from add_sm_performance addsmp join {{ source('public', 'btc_garch_sigma') }} gsfr on addsmp.date_index = gsfr.date_index
 )
 select
     *
-    , abs( lag(log_return, -1) over (order by date_index) ) as response_absolute_log_return
-    , case when sign_log_return = -1 then -1 else 1 end as response_sign_log_return
+    , EXTRACT(DOW FROM date_index) AS day_of_week_number
 from add_garch_sigma

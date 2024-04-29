@@ -8,8 +8,8 @@ sources:
       - name: binance_features
       - name: fed_features
       - name: tradingview_features
-      - name: garch_estimators_from_r
-      - name: garch_sigma_from_r
+      - name: btc_garch_estimators
+      - name: btc_garch_sigma
 
 models:
   - name: squeeze_momentum

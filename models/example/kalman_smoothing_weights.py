@@ -16,14 +16,14 @@ def model(dbt, fal):
     kfs_window_size = int(dbt.config.get("kfs_window_size"))
 
     df: pd.DataFrame = dbt.ref("sm_feature_matrix")
-    df = df[["date_index", "log_return", "skew_estimate", "bitcoin_dominance"]]
+    df = df[["date_index", "log_return", "pvalue_ar1", "bitcoin_dominance"]]
 
     df['lead_log_return'] = df['log_return'].shift(-1)
     df = df.dropna()
 
-    y = df['skew_estimate'] + 1
+    y = df['pvalue_ar1'] + 1
     y = np.log(y) - np.log(y.shift(1))
-    df['skew_log_return'] = y
+    df['pvalue_ar1_log_return'] = y
     df = df.dropna()
 
     model = KalmanSmoother(
@@ -38,7 +38,7 @@ def model(dbt, fal):
         state_cov=[[Q]],
     )
 
-    model.bind(df['skew_log_return'].values)
+    model.bind(df['pvalue_ar1_log_return'].values)
     model.initialize_known([0], [[0]])
 
     results = model.filter()
@@ -88,6 +88,6 @@ def model(dbt, fal):
 
     df['weight'] = weights
 
-    df.drop(columns=['skew_log_return'], inplace=True)
+    df.drop(columns=['pvalue_ar1_log_return'], inplace=True)
 
     return df
