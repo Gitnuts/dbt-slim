@@ -1,0 +1,27 @@
+version: 2
+
+sources:
+  - name: public
+    database: PROJECT
+    schema: public
+    tables:
+      - name: gld_features
+
+models:
+  - name: gld_squeeze_momentum
+    description: "Squeeze momentum model"
+    columns:
+      - name: timestamp
+        description: "The primary key for this table"
+        tests:
+          - unique
+      - name: squeeze
+        description: "The squeeze value"
+      - name: close_price
+        description: "The close price"
+      - name: momentum
+        description: "The momentum value"
+      - name: consecutive_sqz_on
+        description: "The number of consecutive squeezes on"
+      - name: row_index
+        description: "The row index linked to the row number (see batch_size varaible in dbt_project.yml)"

@@ -1,0 +1,25 @@
+version: 2
+
+sources:
+  - name: public
+    database: PROJECT
+    schema: public
+    tables:
+      - name: sp500_above_50_day_average_tradingview_features
+      - name: sp500_above_200_day_average_tradingview_features
+      - name: sp500_above_5_day_average_tradingview_features
+      - name: sp500_above_20_day_average_tradingview_features
+      - name: us_stocks_block_trades_tradingview_features
+      - name: us_stocks_tick_of_trades_tradingview_features
+      - name: put_volume_cboe_tradingview_features
+      - name: call_volume_cboe_tradingview_features
+      - name: put_volume_spx_tradingview_features
+      - name: call_volume_spx_tradingview_features
+      - name: put_call_ratio_spx_tradingview_features
+      - name: put_call_ratio_cboe_tradingview_features
+      - name: us_stocks_above_vwap_tradingview_features
+      - name: total_advance_decline_ratio_tradingview_features
+      - name: us_stocks_advance_decline_ratio_tradingview_features
+      - name: us_stocks_number_of_trades_tradingview_features
+      - name: pmi_tradingview_features
+

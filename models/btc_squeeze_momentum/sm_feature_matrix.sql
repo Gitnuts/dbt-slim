@@ -47,10 +47,9 @@ add_tradingview_features as (
 add_fed_features as (
     select
         add_tradingview_features.*
-        , "DFF" as interest_rate
-        , "DTWEXBGS" as dollar_index
-        , "T10YIE" as inflation_rate
-    from add_tradingview_features join {{ source('public', 'fed_features') }} as fed_features
+        , fed_funds_rate as interest_rate
+        , ten_year_inflation_rate as inflation_rate
+    from add_tradingview_features join {{ ref('adj_fed_features') }} as fed_features
         on add_tradingview_features.date_index = fed_features."date"::date
     order by add_tradingview_features.date_index
 ),
@@ -76,11 +75,10 @@ add_garch_sigma as (
     select
 		addsmp.*
 		, mu
-		, sigma
+		, lag(sigma, -1) over (order by addsmp.date_index) as predicted_sigma -- sigma has a prediction horizon of 1 day
 		, skew
 		, shape
 		, realized
-		, sign( lag(log_return, -1) over (order by addsmp.date_index) ) as sign_log_return
 	from add_sm_performance addsmp join {{ source('public', 'btc_garch_sigma') }} gsfr on addsmp.date_index = gsfr.date_index
 )
 select
